@@ -65,6 +65,19 @@ namespace BlazorWebAssemblyApp.Services
             return [.. Generics.DeserializeJsonStringList<WeatherForecast>(result)];
         }
 
+        public async Task<WeatherForecast[]> GetWeatherForecastAdmin()
+        {
+            string token = await localStorageService.GetItemAsStringAsync("token");
+            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var response = await httpClient.GetAsync("api/WeatherForecast/admin");
 
+
+            //Read Response
+            if (!response.IsSuccessStatusCode)
+                return null!;
+
+            var result = await response.Content.ReadAsStringAsync();
+            return [.. Generics.DeserializeJsonStringList<WeatherForecast>(result)];
+        }
     }
 }

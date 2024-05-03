@@ -2,6 +2,8 @@
 @using SharedClassLibrary.Contracts
 @using SharedClassLibrary.DTOs
 @inject IWeather WeatherService
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
 
 <PageTitle>Weather</PageTitle>
 
@@ -24,25 +26,50 @@ else
                 <th>Summary</th>
             </tr>
         </thead>
+        <p>User Forecasts</p>
         <tbody>
-            @foreach (var forecast in forecasts)
-            {
-                <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
-                </tr>
-            }
+            <AuthorizeView Roles="Admin">
+                @foreach (var forecast in forecasts)
+                {
+                    <tr>
+                        <td>@forecast.Date.ToShortDateString()</td>
+                        <td>@forecast.TemperatureC</td>
+                        <td>@forecast.TemperatureF</td>
+                        <td>@forecast.Summary</td>
+                    </tr>
+                }
+            </AuthorizeView>
+
         </tbody>
+        <p>Admin Forecasts</p>
+        <tbody>
+            <AuthorizeView Roles="Admin">
+                @foreach (var forecast in adminforecasts)
+                {
+                    <tr>
+                        <td>@forecast.Date.ToShortDateString()</td>
+                        <td>@forecast.TemperatureC</td>
+                        <td>@forecast.TemperatureF</td>
+                        <td>@forecast.Summary</td>
+                    </tr>
+                }
+            </AuthorizeView>
+        </tbody>
+
     </table>
 }
 
 @code {
     private WeatherForecast[]? forecasts;
+    private WeatherForecast[]? adminforecasts;
+
 
     protected override async Task OnInitializedAsync()
     {
+
+
         forecasts = await WeatherService.GetWeatherForecast();
+        adminforecasts = await WeatherService.GetWeatherForecastAdmin();
+
     }
 }
